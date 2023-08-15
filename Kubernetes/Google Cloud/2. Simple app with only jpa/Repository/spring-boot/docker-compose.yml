@@ -1,0 +1,35 @@
+version: "3"
+services:
+  #docker will create an application first and database will not be found and resulting error is 'Communications link failure'.
+  #Rerun the application after the database has been full created
+  #firewall in the WiFi blocks pulling tasks... there when doing pulling tasks switch to mobile data
+  server:
+    image: shologuanda/docker-testing-only-jpa
+    build:
+      context: .
+    container_name: springboot-testing
+    ports:
+      - "8080:8080"
+    environment:
+      #these values are passed to the application
+      - DB_HOST=mysqldb #container
+      - DB_NAME=applications
+      - DB_USERNAME=root
+      - DB_PASSWORD=cput
+    networks:
+      - springmysql-net
+    depends_on:
+      - mysqldb
+
+  mysqldb:
+    image: mysql:5.7
+    container_name: mysqldb
+    networks:
+      - springmysql-net
+    environment:
+      #these values are assigned to mysql
+      #username is 'root' by default
+      - MYSQL_ROOT_PASSWORD=cput
+      - MYSQL_DATABASE=applications #initialise database on startup
+networks:
+  springmysql-net:
